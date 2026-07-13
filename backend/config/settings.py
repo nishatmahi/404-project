@@ -121,4 +121,9 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
+# Allow ALL vercel.app preview and production deployments automatically
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
+
 CORS_ALLOW_CREDENTIALS = True
