@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
@@ -10,7 +10,9 @@ const playfair = Playfair_Display({ subsets: ["latin"], style: ["italic"] });
 
 import { useAuthStore } from "@/store/auth-store";
 
-export default function LoginPage() {
+// ── Inner component (uses useSearchParams — must be inside Suspense) ──────────
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
@@ -50,7 +52,76 @@ export default function LoginPage() {
     }
   }
 
+  return (
+    <form
+      onSubmit={handleSubmit}
+      autoComplete="off"
+      className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+    >
+      <div className="mb-7 flex items-center gap-3">
+        <div className="grid h-11 w-11 place-items-center rounded-md bg-teal-700 text-white">
+          <LockKeyhole size={20} aria-hidden="true" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-950">Sign in</h2>
+          <p className="text-sm text-slate-500">Enter your email and password.</p>
+        </div>
+      </div>
 
+      <label className="block text-sm font-medium text-slate-700">
+        Email
+        <input
+          id="login-email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+          className="mt-2 h-11 w-full rounded-md border border-slate-200 px-3 outline-none focus:border-teal-600"
+          required
+          autoComplete="off"
+        />
+      </label>
+
+      <label className="mt-4 block text-sm font-medium text-slate-700">
+        Password
+        <input
+          id="login-password"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Your password"
+          className="mt-2 h-11 w-full rounded-md border border-slate-200 px-3 outline-none focus:border-teal-600"
+          required
+          autoComplete="new-password"
+        />
+      </label>
+
+      {error ? (
+        <p className="mt-4 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
+      ) : null}
+
+      <button
+        id="login-submit"
+        type="submit"
+        disabled={isSubmitting}
+        className="mt-6 h-11 w-full rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:opacity-60"
+      >
+        {isSubmitting ? "Signing in..." : "Sign in"}
+      </button>
+
+      <p className="mt-4 text-sm text-slate-600">
+        New here?{" "}
+        <Link href="/register" className="font-semibold text-teal-700 hover:underline">
+          Create an account
+        </Link>
+      </p>
+    </form>
+  );
+}
+
+// ── Page export (wraps LoginForm in Suspense, required by Next.js) ────────────
+
+export default function LoginPage() {
   return (
     <main className="grid min-h-screen grid-cols-1 bg-slate-950 lg:grid-cols-[1.05fr_0.95fr]">
       {/* Left hero panel */}
@@ -77,7 +148,7 @@ export default function LoginPage() {
               animation: gradientMove 15s ease infinite;
             }
           `}</style>
-          
+
           <h1 className={`animate-text-1 mb-4 text-4xl font-bold uppercase tracking-[0.15em] text-cyan-100 sm:text-5xl ${playfair.className}`}>
             404 Project Not Found
           </h1>
@@ -87,69 +158,11 @@ export default function LoginPage() {
         </div>
       </section>
 
-      {/* Right form panel */}
+      {/* Right form panel — Suspense required because LoginForm uses useSearchParams */}
       <section className="flex items-center justify-center bg-[#f6f4ef] px-4 py-10">
-        <form
-          onSubmit={handleSubmit}
-          autoComplete="off"
-          className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="mb-7 flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-md bg-teal-700 text-white">
-              <LockKeyhole size={20} aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-slate-950">Sign in</h2>
-              <p className="text-sm text-slate-500">Enter your email and password.</p>
-            </div>
-          </div>
-
-          <label className="block text-sm font-medium text-slate-700">
-            Email
-            <input
-              id="login-email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              className="mt-2 h-11 w-full rounded-md border border-slate-200 px-3 outline-none focus:border-teal-600"
-              required
-              autoComplete="off"
-            />
-          </label>
-
-          <label className="mt-4 block text-sm font-medium text-slate-700">
-            Password
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="Your password"
-              className="mt-2 h-11 w-full rounded-md border border-slate-200 px-3 outline-none focus:border-teal-600"
-              required
-              autoComplete="new-password"
-            />
-          </label>
-
-          {error ? <p className="mt-4 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p> : null}
-
-          <button
-            id="login-submit"
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-6 h-11 w-full rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:opacity-60"
-          >
-            {isSubmitting ? "Signing in..." : "Sign in"}
-          </button>
-
-          <p className="mt-4 text-sm text-slate-600">
-            New here?{" "}
-            <Link href="/register" className="font-semibold text-teal-700 hover:underline">
-              Create an account
-            </Link>
-          </p>
-        </form>
+        <Suspense fallback={<div className="h-11 w-full max-w-md animate-pulse rounded-lg bg-slate-200" />}>
+          <LoginForm />
+        </Suspense>
       </section>
     </main>
   );
