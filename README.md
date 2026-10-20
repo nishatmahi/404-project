@@ -4,7 +4,7 @@ This repository contains the complete code for the **404 Project Not Found** app
 
 ## Live Demo URLs
 
-- **Frontend (Vercel):** https://404-project-git-main-nishatmahis-projects.vercel.app
+- **Portfolio:** https://nishatmahi.github.io
 - **Backend API (PythonAnywhere):** https://mahitasnim.pythonanywhere.com/api/
 - **Backend Admin (PythonAnywhere):** https://mahitasnim.pythonanywhere.com/admin/
 
